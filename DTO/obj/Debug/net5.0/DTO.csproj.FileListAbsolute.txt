@@ -1,0 +1,15 @@
+C:\Users\proto\source\repos\Web\DTO\bin\Debug\net5.0\DTO.deps.json
+C:\Users\proto\source\repos\Web\DTO\bin\Debug\net5.0\DTO.dll
+C:\Users\proto\source\repos\Web\DTO\bin\Debug\net5.0\ref\DTO.dll
+C:\Users\proto\source\repos\Web\DTO\bin\Debug\net5.0\DTO.pdb
+C:\Users\proto\source\repos\Web\DTO\obj\Debug\net5.0\DTO.csproj.AssemblyReference.cache
+C:\Users\proto\source\repos\Web\DTO\obj\Debug\net5.0\DTO.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\proto\source\repos\Web\DTO\obj\Debug\net5.0\DTO.AssemblyInfoInputs.cache
+C:\Users\proto\source\repos\Web\DTO\obj\Debug\net5.0\DTO.AssemblyInfo.cs
+C:\Users\proto\source\repos\Web\DTO\obj\Debug\net5.0\DTO.csproj.CoreCompileInputs.cache
+C:\Users\proto\source\repos\Web\DTO\obj\Debug\net5.0\DTO.csproj.CopyComplete
+C:\Users\proto\source\repos\Web\DTO\obj\Debug\net5.0\DTO.dll
+C:\Users\proto\source\repos\Web\DTO\obj\Debug\net5.0\ref\DTO.dll
+C:\Users\proto\source\repos\Web\DTO\obj\Debug\net5.0\DTO.pdb
+C:\Users\proto\source\repos\Web\DTO\bin\Debug\net5.0\DAL.dll
+C:\Users\proto\source\repos\Web\DTO\bin\Debug\net5.0\DAL.pdb
