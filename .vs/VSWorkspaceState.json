@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\BLL",
+    "\\BLL\\Services",
+    "\\BLL\\Services\\CourseService",
+    "\\Infrastructure",
+    "\\Infrastructure\\Queries"
+  ],
+  "SelectedNode": "\\Infrastructure\\Queries\\UserQuery.cs",
+  "PreviewInSolutionExplorer": false
+}
