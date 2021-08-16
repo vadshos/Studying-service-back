@@ -19,6 +19,6 @@
 
         public string OrderBy { get; set; }
 
-        public string SeachText { get; set; }
+        public string SearchText { get; set; }
     }
 }

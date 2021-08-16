@@ -23,34 +23,29 @@ namespace BLL.Services
         private readonly IMapper mapper;
 
         public AccountService(IUserQuery userQuery,
+            IUserCommand command,
             IMailService mailService,
             IMapper mapper)
         {
             this.mapper = mapper;
             this.mailService = mailService;
             query = userQuery;
+            this.command = command;
         }
 
         public async Task<ResponseDto> Delete(string id)
         {
-            var user = await query.FindById(id);
-            if (user == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, "User with this id didn't found");
-            }
-
-            await query.Delete(user);
-
+            command.Remove(id);
             return new ResponseDto {Status = "Ok", Message = "User was successful delete"};
         }
 
         public PaginationDto<UserDto> GetPagination(StudentParameters studentParameters)
         {
             var users = query.GetUserWithSubscribtions();
-            if (!string.IsNullOrWhiteSpace(studentParameters.SeachText))
+            if (!string.IsNullOrWhiteSpace(studentParameters.SearchText))
             {
-                users = users.Where(u => u.UserName.ToLower().Contains(studentParameters.SeachText.ToLower()) ||
-                                         u.Email.ToLower().Contains(studentParameters.SeachText.ToLower()));
+                users = users.Where(u => u.UserName.ToLower().Contains(studentParameters.SearchText.ToLower()) ||
+                                         u.Email.ToLower().Contains(studentParameters.SearchText.ToLower()));
             }
 
             users = ApplySortService.ApplySort(users, studentParameters.OrderBy).AsQueryable();
@@ -70,15 +65,24 @@ namespace BLL.Services
             return new PaginationDto<UserDto> {Collection = mapper.Map<List<UserDto>>(accounts),MetadataPaginationDto = metadata};
         }
 
-        public void Subscribe(string userName, int courseId, DateTime startStudyDate)
+        public void Subscribe(string userId, int courseId, DateTime startStudyDate)
         {
-            var userId = query.GetIdByUserName(userName);
+            //var userId = query.GetIdByUserName(userName);
             var daysToStart = (startStudyDate - DateTime.UtcNow).Days;
+            
             var userCourse = query.GetUserCourseByUserIdAndCourseId(userId, courseId);
 
-            CreateBodyForMailAboutStartStudy(userCourse, daysToStart);
+            if (userCourse != null)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Subscription is already exist");
+            }
 
             command.Subscribe(userId, courseId, startStudyDate);
+            
+            userCourse = query.GetUserCourseByUserIdAndCourseId(userId, courseId);
+              
+            CreateBodyForMailAboutStartStudy(userCourse, daysToStart);
+
         }
 
         public void CreateBodyForMailAboutStartStudy(UserCourse userCourse, int daysToStart)
@@ -99,18 +103,28 @@ namespace BLL.Services
 
             foreach (var item in daysToStartStudy)
             {
-                if (item == startStudyToday)
+                if (daysToStart >= item)
                 {
-                    request.DayToStart = "today";
-                }
-                else
-                {
-                    request.DayToStart = $"{item} days";
-                }
+                    if (item == startStudyToday)
+                    {
+                        request.DayToStart = "today";
+                    }
+                    else
+                    {
+                        request.DayToStart = $"{item} days";
+                    }
 
-                var jobId = AddJobSendEmailAboutStartStudy(request, daysToStart - item);
-                userCourse.HangfireJobs.Add(new HangfireJob {JobId = jobId, UserCourse = userCourse}); //other method
+                    var jobId = AddJobSendEmailAboutStartStudy(request, daysToStart - item);
+                    AddHangfireJobToUserCourses(jobId, userCourse);
+                }
             }
+        }
+
+        public void AddHangfireJobToUserCourses(string jobId,UserCourse userCourse)
+        {
+            userCourse.HangfireJobs.Add(new HangfireJob  
+                                               {JobId = jobId, 
+                                                UserCourse = userCourse}); 
         }
 
         public string AddJobSendEmailAboutStartStudy(StartStudyMailDto request, int days)
@@ -121,9 +135,8 @@ namespace BLL.Services
             return jobId;
         }
 
-        public void UnSubscribe(string userName, int courseId)
+        public void UnSubscribe(string userId, int courseId)
         {
-            var userId = query.GetIdByUserName(userName);
             var userCourse = query.GetUserCourseByUserIdAndCourseId(userId, courseId);
             var jobsId = userCourse.HangfireJobs.Select(uc => uc.JobId);
 
@@ -137,13 +150,19 @@ namespace BLL.Services
 
         public async Task<UserDto> GetById(string id)
         {
-            var user = await query.FindById(id);
+            var user =  query.FindById(id);
             return mapper.Map<UserDto>(user);
         }
 
-        public Task<UserDto> Update(string id, UpdateDto model)
+        public async Task<UserDto> Update(string id, UpdateDto model)
         {
-            throw new NotImplementedException();
+            var user = mapper.Map<ApplicationUser>(model);
+            
+            var res = await command.UpdateUser(id,user);
+
+             var dto =   mapper.Map<UserDto>(res);
+             
+             return dto;
         }
 
     }

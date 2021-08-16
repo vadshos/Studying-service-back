@@ -6,6 +6,14 @@ namespace BLL.Services
 {
     public interface ICourseService
     {
-        PaginationDto<CourseDto> GetPagination(CourseParameters courseParameters);
+        Task<PaginationDto<CourseDto>> GetPagination(CourseParameters courseParameters,string userId);
+
+        Task<PaginationDto<CourseDto>> GetPaginationSubscription(CourseParameters courseParameters, string userId);
+        
+        Task<CourseDto> Update(UpdateCourseDto model,int Id);
+
+        void AddCourse(CourseDto dto);
+        
+        void Remove(int id);
     }
 }

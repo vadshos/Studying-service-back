@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using BLL.Helpers;
 using BLL.Services;
 using DTO;
@@ -8,28 +10,70 @@ using Newtonsoft.Json;
 
 namespace API.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CourseController : ControllerBase
     {
-
         private readonly ICourseService courseService;
+
         public CourseController(ICourseService courseService)
         {
             this.courseService = courseService;
         }
-
-        [HttpGet]
-        public ActionResult<IEnumerable<CourseDto>> GetPagination([FromQuery] CourseParameters courseParameters)
+        
+        [HttpPost]
+        [Route("getPagination")]
+        public async Task<ActionResult<IEnumerable<CourseDto>>> GetPagination([FromBody] CourseParameters courseParameters)
         {
-            var courses = courseService.GetPagination(courseParameters);
+            var courses = await courseService.GetPagination(courseParameters,GetIdFromClaims());
+            return Ok(courses);
+        }
 
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(UpdateCourseDto dto,int id)
+        {
+            var course = await courseService.Update(dto, id);
+            return Ok(course);
+        }
+        
+        [Authorize]
+        [HttpPost]
+        [Route("getPaginationSubscription")]
+        public async Task<ActionResult<IEnumerable<CourseDto>>> GetPaginationSubscription([FromBody] CourseParameters courseParameters)
+        {
 
+            var courses = await courseService.GetPaginationSubscription(courseParameters,GetIdFromClaims());
+            return Ok(courses);
+        }
 
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(courses.MetadataPaginationDto));
+        [Authorize]
+        [HttpPost]
+        [Route("add")]
+        public IActionResult AddCourse([FromBody] CourseDto dto)
+        {
+            courseService.AddCourse(dto);
+            return Ok();
+        }
 
-            return Ok(courses.Collection);
+        [Authorize]
+        [HttpDelete("{id}")]
+        public IActionResult RemoveCourse(int id)
+        {
+            courseService.Remove(id);
+            return Ok();
+        }
+        
+       //helper
+        public string GetIdFromClaims()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                return identity.FindFirst("Id")?.Value;
+            }
+
+            return null;
         }
     }
 }

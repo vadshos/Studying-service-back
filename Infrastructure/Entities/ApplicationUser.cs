@@ -15,7 +15,7 @@ namespace DAL.Entities
 
         public int Age { get; set; }
 
-        public List<UserCourse> UserCourses { get; set; }
+        public virtual List<UserCourse> UserCourses { get; set; } = new List<UserCourse>();
 
         public DateTime RegisteredDate { get; set; }
 

@@ -32,7 +32,7 @@ namespace API
         }
 
         public IConfiguration Configuration { get; }
-
+        
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -108,35 +108,51 @@ namespace API
 
             services.AddTransient<IMailService, MailService>();
 
+            services.AddTransient<ICourseService, CourseService>();
+            
             services.AddTransient<IAccountService,AccountService>();
 
             services.AddTransient<IAutheticateService, AutheticateService>();
 
+            services.AddTransient<ICourseCommand, CourseCommand>();
+
             services.AddDbContext<ApplicationDbContext>(options =>
                                                          options.UseSqlServer(Configuration
-                                                                 .GetConnectionString("ConnStr")));
+                                                                 .GetConnectionString("ConnStr")).EnableSensitiveDataLogging());;
 
 
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+            
+            services.AddHttpClient();
 
+            services.Configure<FacebookAuthSettings>(Configuration.GetSection("FacebookAuthSettings"));
+
+            services.AddSingleton<FacebookAuthSettings>();
+                
+            services.AddTransient<IFacebookAuthService, FacebookAuthService>();
+            
             services.Configure<AuthOptions>(Configuration.GetSection("AuthOptions"));
 
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
 
             services.AddTransient<IJwtUtils, JwtUtils>();
 
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
           
-
+            
             app.UseMiddleware<CustomExceptionMiddleware>();
             app.UseCors(x => x
             .AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader());
-
+            
+            
+            app.UseHangfireDashboard();
+            
             if (env.IsDevelopment())
             {
                 app.UseExceptionHandler("/error-local-development");
@@ -159,6 +175,7 @@ namespace API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
             });
         }
     }

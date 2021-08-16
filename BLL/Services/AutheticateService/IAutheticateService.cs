@@ -12,5 +12,7 @@ namespace BLL.Services
         Task VerifyEmail(string userId, string token);
 
         Task<AuthenticateResponseDto> RefreshToken(string token, string ip);
+
+        Task<AuthenticateResponseDto> LoginWithFacebook(string accessToken, string ipAddress);
     }
 }

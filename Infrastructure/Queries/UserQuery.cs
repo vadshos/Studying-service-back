@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -15,37 +16,39 @@ namespace DAL.Queries
         
         public IQueryable<ApplicationUser> GetUserWithSubscribtions()
         {
-            var users = context.Users.Include(u => u.UserCourses);
+            var users = context.Users.Include(u => u.UserCourses).ThenInclude(uc => uc.Course);
             return users;
         }
 
         public RefreshToken GetRefreshTokenByToken(string token)
         {
-            return context.Users.Include(u => u.RefreshTokens)
-                .Select(u => u.RefreshTokens.SingleOrDefault(t => t.Token == token))
-                .Single();
+            var tokens = context.Users.Include(u => u.RefreshTokens);
+
+            var tokens2 = tokens.FirstOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+
+           var tokenR =  tokens2.RefreshTokens.Last();
+
+           return tokenR;
         }
 
         public UserCourse GetUserCourseByUserIdAndCourseId(string userId, int courseId)
         {
-            return context.UserCourses.Single( uc => uc.CourseId == courseId && uc.StudentId == userId );
+            return  context.UserCourses.Include(uc =>
+                uc.Course
+                ).Include(uc => uc.Student).FirstOrDefault( uc => uc.CourseId == courseId && uc.StudentId == userId );
         }
 
         public RefreshToken GetRefreshTokenFromUserByToken(ApplicationUser user,string token)
         {
             return user.RefreshTokens.SingleOrDefault(x => x.Token == token);
         }
-
-        public async Task Delete(ApplicationUser user)
+        
+        public  ApplicationUser FindById(string id)
         {
-            var res = context.Users.Remove(user);
-
-            await context.SaveChangesAsync();
-        }
-
-        public async Task<ApplicationUser> FindById(string id)
-        {
-            return await context.Users.SingleOrDefaultAsync(u =>u.Id == id);
+                var user = context.Users.Include(u => u.UserCourses).ThenInclude(c => c.Course).SingleOrDefault(u =>u.Id == id);
+                return user;
+                
+                
         }
 
         public string GetIdByUserName(string userName)

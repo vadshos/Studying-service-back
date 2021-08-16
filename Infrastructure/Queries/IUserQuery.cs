@@ -14,9 +14,7 @@ namespace DAL.Queries
 
         RefreshToken GetRefreshTokenFromUserByToken(ApplicationUser user, string token);
 
-        Task Delete(ApplicationUser user);
-
-        Task<ApplicationUser> FindById(string id);
+        ApplicationUser FindById(string id);
         
         string GetIdByUserName(string userName);
     }

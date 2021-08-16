@@ -12,7 +12,7 @@ namespace DAL.Queries
         {
             const string sortSequebceDesc = "descending";
             const string sortSequebceAsce = "ascending";
-            const string checkSequenceSort = "desc";
+            const string checkSequenceSort = " descend";
 
             if (string.IsNullOrWhiteSpace(orderByQueryString) || users == null || !users.Any())
             {

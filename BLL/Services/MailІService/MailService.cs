@@ -54,7 +54,7 @@ namespace BLL.Services
             StreamReader str = new StreamReader(FilePath);
             string MailText = await str.ReadToEndAsync();
             str.Close();
-            MailText = MailText.Replace("[Name]", request.Name).Replace("[courseName]", request.CourseName).Replace("{dayToStart}", $"{request.DayToStart}");
+            MailText = MailText.Replace("[Name]", request.Name).Replace("[courseName]", request.CourseName).Replace("[dayToStart]", $"{request.DayToStart}");
             var email = new MimeMessage {Sender = MailboxAddress.Parse(mailSettings.Mail)};
             email.To.Add(MailboxAddress.Parse(request.ToEmail));
             email.Subject = $"Welcome {request.Name}";

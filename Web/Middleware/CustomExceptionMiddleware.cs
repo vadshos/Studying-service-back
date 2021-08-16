@@ -3,18 +3,22 @@ using System.Net;
 using System.Threading.Tasks;
 using BLL.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using NLog.LayoutRenderers;
 
 namespace API.Middleware
 {
       public class CustomExceptionMiddleware
     {
+        private readonly ILogger<CustomExceptionMiddleware> logger;  
         private readonly RequestDelegate next;
 
-        public CustomExceptionMiddleware(RequestDelegate next)
+        public CustomExceptionMiddleware(RequestDelegate next,ILogger<CustomExceptionMiddleware> logger)
         {
             this.next = next;
+            this.logger = logger;
         }
-
+      
         public async Task Invoke(HttpContext context )
         {
             try
@@ -23,10 +27,12 @@ namespace API.Middleware
             }
             catch (HttpStatusCodeException ex)
             {
+                logger.LogError(ex.Message);
                 await HandleExceptionAsync(context, ex);
             }
             catch (Exception exceptionObj)
             {
+                logger.LogError(exceptionObj.Message);
                 await HandleExceptionAsync(context, exceptionObj);
             }
         }

@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 
 namespace DAL.Entities
 {
-    [Owned]
     public class RefreshToken
     {
         [Key]

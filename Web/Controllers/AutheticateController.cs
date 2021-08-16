@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using BLL.Services;
 using DTO;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,8 @@ namespace API.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]"
+    )]
     public class AutheticateController :ControllerBase
     {
         private readonly IAutheticateService accountService;
@@ -27,12 +29,24 @@ namespace API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("register")]
+        [HttpPost]
+        [Route("register")]
         public async Task<IActionResult> Register(RegisterDto model)
         {           
+            Console.WriteLine(Request.Host.Host);
             await accountService.Register(model);              
             return Ok();
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("facebookAuthenticate")]
+        public async Task<IActionResult> LoginWithFacebook(TokenDto token)
+        {
+            var response = await accountService.LoginWithFacebook(token.Token, ipAddress());
+            return Ok(response);
+        }
+        
 
         [AllowAnonymous]
         [HttpPost("verify-email")]

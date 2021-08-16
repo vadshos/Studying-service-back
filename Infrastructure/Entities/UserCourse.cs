@@ -17,6 +17,6 @@ namespace DAL.Entities
 
         public DateTime StartStudyDate { get; set; }
 
-        public virtual List<HangfireJob> HangfireJobs { get; set; }
-     }
+        public virtual List<HangfireJob> HangfireJobs { get; set; } = new List<HangfireJob>();
+    }
 }

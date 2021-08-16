@@ -14,6 +14,6 @@ namespace DAL.Entities
 
         public string UrlToLogo { get; set; }
 
-        public virtual ICollection<UserCourse> UserCourses { get; set; }
+        public virtual ICollection<UserCourse> UserCourses { get; set; } = new List<UserCourse>();
     }
 }

@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using DTO;
 using DAL.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace BLL.Helpers
 {
@@ -9,6 +11,8 @@ namespace BLL.Helpers
         public AutoMapperProfile()
         {
 
+            CreateMap<UpdateCourseDto, CourseDto>();
+            
             CreateMap<UserDto, ApplicationUser>();
 
             CreateMap<UserCourseDto, UserCourse>();
@@ -21,6 +25,10 @@ namespace BLL.Helpers
 
             CreateMap<CourseModel, CourseDto>();
 
+            CreateMap<UpdateDto, ApplicationUser>();
+            
+            CreateMap< ApplicationUser,UpdateDto>();
+
             CreateMap<UserCourse, UserCourseDto>()
                 .ForMember(dest => dest.Description,
                     opt => opt.MapFrom(src => src.Course.Description))
@@ -28,7 +36,10 @@ namespace BLL.Helpers
                     opt => opt.MapFrom(src => src.Course.Name))
                 .ForMember(dest => dest.Id,
                            opt => opt.MapFrom(src => src.Id));
+                
+            CreateMap<ApplicationUser, AuthenticateResponseDto>();
 
+            CreateMap<FacebookUserInfoDto, ApplicationUser>();
 
             CreateMap<RegisterDto, ApplicationUser>();
         }
